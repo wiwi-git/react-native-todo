@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled, { ThemeProvider } from "styled-components";
 import { theme } from "./theme";
 import { Dimensions, StatusBar } from "react-native";
@@ -30,19 +30,27 @@ const List = styled.ScrollView`
 
 export default () => {
     const [newTask, setNewTask] = useState('');
-    const [tasks, setTasks] = useState({
-        '1' : { id: '1', text: 'Hanbit', completed: false},
-        '2' : { id: '2', text: 'Hanbit asdf ', completed: true}
-    });
-
-    const _addTask = () => {
-        alert(`Add: ${newTask}`);
-        setNewTask('');
-    };
+    const [tasks, setTasks] = useState({});
 
     const _handleTextChange = text => {
         setNewTask(text);
     };
+
+    const _addTask = () => {
+        const ID = Date.now().toString();
+        const newTaskObject = {
+            [ID] : { id:ID, text: newTask, completed: false },
+        };
+        setNewTask('');
+        setTasks({...tasks, ...newTaskObject});
+    };
+
+    const _deleteTask = (id) => {
+        const currentTasks = Object.assign({}, tasks);
+        const result = delete currentTasks[id];
+        console.log('delete result = ', result , ' id : ',id);
+        setTasks(currentTasks);
+    }
 
     const width = Dimensions.get('window').width;
 
@@ -62,8 +70,8 @@ export default () => {
                 />
                 <List width={width}>
                     {
-                        Object.values(tasks).reverse.map(item => (
-                            <Task text={item.text}/>
+                        Object.values(tasks).reverse().map(item => (
+                            <Task key={item.id} item={item} deleteTask={_deleteTask} />
                         ))
                     }
                 </List>
