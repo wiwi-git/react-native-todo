@@ -1,8 +1,11 @@
 import React, { useState } from "react";
 import styled, { ThemeProvider } from "styled-components";
 import { theme } from "./theme";
-import { StatusBar } from "react-native";
+import { Dimensions, StatusBar } from "react-native";
 import Input from "./components/Input";
+import IconButton from "./components/IconButton";
+import { images } from "./images";
+import Task from "./components/Task";
 
 const Container = styled.SafeAreaView`
     flex: 1;
@@ -17,11 +20,21 @@ const Title = styled.Text`
     color: ${({theme})=>theme.main};
     align-self: flex-start;
     margin: 0px 20px;
+`;
+
+const List = styled.ScrollView`
+    flex: 1;
+    width: ${({ width})=> width - 40}px;
 `
 
 
 export default () => {
     const [newTask, setNewTask] = useState('');
+    const [tasks, setTasks] = useState({
+        '1' : { id: '1', text: 'Hanbit', completed: false},
+        '2' : { id: '2', text: 'Hanbit asdf ', completed: true}
+    });
+
     const _addTask = () => {
         alert(`Add: ${newTask}`);
         setNewTask('');
@@ -31,6 +44,7 @@ export default () => {
         setNewTask(text);
     };
 
+    const width = Dimensions.get('window').width;
 
     return (
         <ThemeProvider theme={theme}>
@@ -46,6 +60,13 @@ export default () => {
                     onChangeText={_handleTextChange}
                     onSubmitEditing={_addTask}
                 />
+                <List width={width}>
+                    {
+                        Object.values(tasks).reverse.map(item => (
+                            <Task text={item.text}/>
+                        ))
+                    }
+                </List>
             </Container>
         </ThemeProvider>
     )
