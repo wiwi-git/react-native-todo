@@ -29,6 +29,8 @@ const List = styled.ScrollView`
 
 
 export default () => {
+    const width = Dimensions.get('window').width;
+
     const [newTask, setNewTask] = useState('');
     const [tasks, setTasks] = useState({});
 
@@ -52,7 +54,21 @@ export default () => {
         setTasks(currentTasks);
     }
 
-    const width = Dimensions.get('window').width;
+    const _toggleTask = (id) => {
+        const currentTasks = Object.assign({}, tasks);
+        currentTasks[id]['completed'] = !currentTasks[id]['completed'];
+        setTasks(currentTasks);
+    }
+
+    const _updateTask = (item) => {
+        const currentTasks = Object.assign({}, tasks);
+        currentTasks[item.id] = item;
+        setTasks(currentTasks);
+    }
+
+    const _onBlur = () => {
+        setNewTask('');
+    }
 
     return (
         <ThemeProvider theme={theme}>
@@ -67,11 +83,18 @@ export default () => {
                     value={newTask}
                     onChangeText={_handleTextChange}
                     onSubmitEditing={_addTask}
+                    onBlur={_onBlur}
                 />
                 <List width={width}>
                     {
                         Object.values(tasks).reverse().map(item => (
-                            <Task key={item.id} item={item} deleteTask={_deleteTask} />
+                            <Task 
+                                key={item.id} 
+                                item={item} 
+                                deleteTask={_deleteTask}
+                                toggleTask={_toggleTask}
+                                updateTask={_updateTask}
+                            />
                         ))
                     }
                 </List>
