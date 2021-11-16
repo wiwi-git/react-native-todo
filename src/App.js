@@ -6,6 +6,7 @@ import Input from "./components/Input";
 import IconButton from "./components/IconButton";
 import { images } from "./images";
 import Task from "./components/Task";
+import AsyncStorage from "@react-native-community/async-storage";
 
 const Container = styled.SafeAreaView`
     flex: 1;
@@ -34,6 +35,15 @@ export default () => {
     const [newTask, setNewTask] = useState('');
     const [tasks, setTasks] = useState({});
 
+    const _saveTask = async tasks => {
+        try {
+            await AsyncStorage.setItem('tasks', JSON.stringify(tasks));
+            setTasks(tasks);
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
     const _handleTextChange = text => {
         setNewTask(text);
     };
@@ -44,26 +54,26 @@ export default () => {
             [ID] : { id:ID, text: newTask, completed: false },
         };
         setNewTask('');
-        setTasks({...tasks, ...newTaskObject});
+        _saveTask({ ...tasks, ...newTaskObject});
     };
 
     const _deleteTask = (id) => {
         const currentTasks = Object.assign({}, tasks);
         const result = delete currentTasks[id];
         console.log('delete result = ', result , ' id : ',id);
-        setTasks(currentTasks);
+        _saveTask(currentTasks);
     }
 
     const _toggleTask = (id) => {
         const currentTasks = Object.assign({}, tasks);
         currentTasks[id]['completed'] = !currentTasks[id]['completed'];
-        setTasks(currentTasks);
+        _saveTask(currentTasks);
     }
 
     const _updateTask = (item) => {
         const currentTasks = Object.assign({}, tasks);
         currentTasks[item.id] = item;
-        setTasks(currentTasks);
+        _saveTask(currentTasks);
     }
 
     const _onBlur = () => {
